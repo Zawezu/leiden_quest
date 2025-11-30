@@ -7,7 +7,7 @@ const nextRoundButton = document.getElementById("nextRoundButton");
 const playButton = document.getElementById("playButton");
 
 // Add onclicks 
-if (startGame) startGame.onclick = hideStartScreen;
+if (startGame) startGame.onclick = firstStart;
 if (playButton) playButton.onclick = initializeGame;
 if (resetButton) resetButton.onclick = resetGame;
 if (nextRoundButton) nextRoundButton.onclick = nextRound;
@@ -25,7 +25,6 @@ let questsSet = new Set();
 
 // Initialization of the constant game variables, the elements from the html
 const questLog = document.querySelector('#questLog');
-const menu = document.querySelector('#menu');
 const infoOverlay = document.querySelector('#infoOverlay');
 
 // Initialization of the information popup for landmarks
@@ -103,12 +102,12 @@ function resetGame() {
     startNewRound();
 }
 
-function hideStartScreen() {
+function firstStart() {
     // This function hides the game explanation and starts the game
 
     gameExplanation.style.display = "none";
     infoOverlay.style.display = "block";
-    menu.style.display = "block";
+    initializeGame();
 }
 
 function nextRound() {
@@ -127,7 +126,6 @@ async function initializeGame(){
     // It has a try statement to catch any errors that might occur due to the server not responding
     
     try{
-        if (menu) menu.style.display = "none";
         // score = 0;
         // scoreText.innerHTML = score;
         addQuest("Go to the castle");

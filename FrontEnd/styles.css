@@ -121,32 +121,6 @@ legend {
 }
 
 
-#playButtonArea {
-    display: flex;
-    gap: 4%;
-    margin-top: 10px;
-    justify-content: center;
-}
-
-.playButton{
-    padding: 8px 12px;
-    margin: 0 5px;
-    border: 1px solid #000000;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    text-align: center;
-}
-
-.playButton:hover{
-    background-color: #e0e0e0;
-}
-
-.playButton:active{
-    background-color: #007bff;
-    color: white;
-}
-
 input[type="number"]{
     width: 25%;
 }
@@ -196,7 +170,6 @@ div.barText {
 }
 
 
-#menu,
 #infoOverlay {
     display: none;
 }

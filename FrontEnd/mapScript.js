@@ -1,6 +1,6 @@
 // Initialise the map
 // let map = L.map('map', {maxZoom: 18, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 15, center: [52.1581218,4.4855674]});
-let map = L.map('map', {maxZoom: 22, minZoom:18, zoom: 18, center: [52.1581218,4.4855674],
+let map = L.map('map', {maxZoom: 18, minZoom:18, zoom: 18, center: [52.1581218,4.4855674],
                         dragging: false, doubleClickZoom: false, boxZoom: false, zoomControl: false, 
                         updateWhenIdle: false});
 
@@ -50,21 +50,27 @@ playerIcon = L.icon({
 
 const markerData = [
     {
-    coords: [52.1604534, 4.4898135],
+    coords: [52.161970089412556, 4.484630945127542],
     title: "El Gaucho",
     text: "Delicious empanadas",
     image: "images/empanadas.jpeg",
     questStart: "Eat empanadas",
     },
     {
-    coords: [52.162494, 4.4850174],
+    coords: [52.16294805799125, 4.484440664829482],
+    title: "X falafel",
+    text: "Crispy kip",
+    image: "images/X-Falafel.png",
+    },
+    {
+    coords: [52.16284763059071, 4.484968637263583],
     title: "M Noodle Bar",
     text: "Tasty ramen",
     image: "images/ramen.jpg.webp",
     questStart: "Go to the pancake place",
     },
     {
-    coords: [52.1619697, 4.4863006],
+    coords: [52.16286256892617, 4.485263831974263],
     title: "Pannenkoekenhuis de Schaapsbel",
     text: "Delicious pancakes",
     image: "images/pancakes.jpg",
@@ -90,6 +96,8 @@ const markers = markerData.map((data) => {
 function startNewRound() {
     startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
     endMarker = L.marker(end, {icon: endIcon, zIndexOffset: -999}).addTo(map).bindPopup("End");
+
+    edgeMarker = L.marker(end, {icon: endIcon, zIndexOffset: -998}).addTo(map).bindPopup("");
 
     // The path represents the list of nodes through which the user has passed
     // The detailed path contains all the subnodes going from node to node in order to create a more detailed path with curves
@@ -149,7 +157,7 @@ function clearMap() {
             
             marker.closePopup();
             neighbourMarkers.forEach(function(marker) {marker.remove()});
-
+            edgeMarker.setOpacity(0)
             await moveAlongPositions(playerMarker, subpath);
             currentPosition = playerMarker.getLatLng()
             console.log("Moved to " + currentPosition)
@@ -224,7 +232,9 @@ function moveAlongPositions(marker, path) {
                 animateMarker(marker, path[index], path[index + 1], dist*MOVEMENT_SLOWNESS, () => {
                     step(index + 1);
                 });
+                
             } else {
+                updateEdgeMarker();
                 resolve()
             }
         }
@@ -232,3 +242,62 @@ function moveAlongPositions(marker, path) {
     });
 }
 
+function clamp(x, min, max) {
+    return Math.max(min, Math.min(x, max));
+}
+
+function updateEdgeMarker() {
+    const bounds = map.getBounds();
+    const realMarkerLatLng = endMarker.getLatLng();
+
+    // If real marker is in view → hide edge marker
+    if (bounds.contains(realMarkerLatLng)) {
+        edgeMarker.setOpacity(0);
+        return;
+    }
+
+    const mapSize = map.getSize();
+    const center = map.getCenter();
+
+    const centerPt = map.latLngToContainerPoint(center);
+    const markerPt = map.latLngToContainerPoint(realMarkerLatLng);
+
+    const dx = markerPt.x - centerPt.x;
+    const dy = markerPt.y - centerPt.y;
+
+    const slope = dy / dx;
+
+    let x, y;
+    const padding = 30; // distance from edge to place the marker
+
+    // Determine whether the line hits vertical or horizontal edge first
+    if (Math.abs(slope) < mapSize.y / mapSize.x) {
+        // Hits left or right edge first
+        if (dx > 0) {
+            x = mapSize.x - padding; // right edge
+            y = centerPt.y + slope * (x - centerPt.x);
+        } else {
+            x = padding; // left edge
+            y = centerPt.y + slope * (x - centerPt.x);
+        }
+    } else {
+        // Hits top or bottom
+        if (dy > 0) {
+            y = mapSize.y - padding; // bottom
+            x = centerPt.x + (y - centerPt.y) / slope;
+        } else {
+            y = padding; // top
+            x = centerPt.x + (y - centerPt.y) / slope;
+        }
+    }
+
+    // Clamp within map container
+    x = clamp(x, padding, mapSize.x - padding);
+    y = clamp(y, padding, mapSize.y - padding);
+
+    // Convert container point → lat/lng and move fake marker
+    const latlng = map.containerPointToLatLng([x, y]);
+
+    edgeMarker.setLatLng(latlng);
+    edgeMarker.setOpacity(1); // show edge marker
+}
