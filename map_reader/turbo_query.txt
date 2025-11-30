@@ -1,0 +1,92 @@
+//query at https://overpass-turbo.eu/#
+
+[out:json];
+
+//The query that returns the data for map_full
+
+
+area["landuse"="residential"]["note"="Maredijkbuurt"]->.m;
+area["landuse"="residential"]["note"="Binnenstad"]->.b;
+(
+  node["landuse"="residential"][!"name"][!"note"](52.148,4.496,52.152,4.5);
+  way["landuse"="residential"][!"name"][!"note"](52.148,4.496,52.152,4.5);
+)->.unnamed;
+
+
+
+
+(
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.m);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.b);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.unnamed);
+
+//Stationsplein
+ way(149784143);
+ way(52507453);
+
+ //Oosterkerkstraat
+  way(7449810);
+  way(14945798);
+
+//Lammenschansweg and connective roads
+
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"]["name"~"Lammenschansweg|Koninginnelaan|Geregracht|Leliestraat|Lorentzkade"](52.14738,4.49133,52.15436,4.49525);
+
+ //De Sitterlaan and connective roads
+ way["highway"~"residential|secondary|tertiary|pedestrian|service"]["name"~"De Sitterlaan|Kamerlingh Onnesplein"](52.14707,4.49133,52.14841,4.50070);
+
+//Zijlsingel bridge
+  way(14945511);
+  way(14945508);
+
+//Zoeterwoudsesingel
+  way(737885384);
+  way(561939702);
+  way(7449731);
+  way(561939699);
+  way(737885383);
+
+//Burgsteeg
+  way(7449524);
+  way(233601984);
+  
+//Van der Sterrepad
+  way(1115798293);
+  
+//Mooi Japiksteeg 
+  way(7451045);
+
+//4e Binnenvestgracht 
+  way(391446475);
+  way(391446473);
+
+//Warmonderbrug 
+  way(635825498);
+
+//Stadsmolensluis 
+  way(635827838);
+
+//Zijlpoortsburg
+  way(7450389);
+  way(10875049);
+  way(67485645);
+  way(414404430);
+  way(414404432);
+
+//Rijnzichtbrug 
+  way(7451823);
+  way(7451849);
+  way(7452263);
+
+//Sterrenwachtpad
+  way(885012533);
+  way(885012535);
+  way(1417684222);
+
+//Rijnkade
+  way(7436170);
+
+);
+
+
+out geom;

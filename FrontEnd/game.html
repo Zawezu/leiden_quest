@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leiden Quest</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+</head>
+
+<body>
+    
+    <div id="gameExplanation">
+        <div class="content">
+            <img id="logo" src="logo.webp" alt="Logo">
+            <h1 id="title">Leiden Quest</h1>
+            <div id="subtitle">
+                <p>This is the game guide</p>
+                <p>Nothing for now</p>
+            </div>
+            <button id="startGame"><strong>Start Game</strong></button>
+        </div>
+    </div>
+
+    <fieldset id="menu">
+        <legend>
+            <h1>Leiden Quest</h1>
+        </legend>
+
+        <div id="playButtonArea">
+            <button id ="playButton" type="button" name="playButton"><strong>Play</strong></button>
+    </fieldset>
+
+    <div id="map"></div>
+    
+      <!-- Modal overlay -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+        <h2 id="modalTitle">Title</h2>
+        <p id="modalText">Text goes here</p>
+        <img id="modalImage" src="" alt="Info image" />
+        <br />
+        <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+    </div>
+
+    <div id="infoOverlay">
+        <p>Quests:</p>
+        <div id="questLog"></div>
+    </div>
+
+    <div id="progressBarContainer" class="hidden">
+        <p id="progressText" class="barText"></p>
+        <div id="progressBar" class="bar">
+            <div id="progressFill" class="barFill"></div>
+        </div>
+        <button id="nextRoundButton" class="difButton">Next round</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <script src="mapScript.js"></script>
+    <script src="script.js"></script>
+    
+</body>
+
+</html>
