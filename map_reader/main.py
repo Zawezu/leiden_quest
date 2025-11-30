@@ -2,8 +2,9 @@ from Map import Map
 from flask import Flask, request, jsonify, wrappers
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="FrontEnd")
 CORS(app)
+
 
 # initialize the map object globally so that it can be used dynamically by the server, 
 # when frontend sends requests with updated player position
@@ -35,6 +36,10 @@ def send_neighbours(data: dict[str]) -> wrappers.Response:
     return jsonify({"neighbours": game.get_neighbours_and_roads(data["current"])})
 
 
+@app.route("/")
+def index():
+    return app.send_static_file("game.html")
+
 @app.route('/main', methods=['POST'])
 def main()-> tuple[wrappers.Response, int] | wrappers.Response:
     """
@@ -55,4 +60,12 @@ def main()-> tuple[wrappers.Response, int] | wrappers.Response:
 
 if __name__ == "__main__":
     # run the server, open it on all ports
+
+
+    # @app.route("/360_images/<path:filename>")
+    # def images(filename):
+    #     return send_from_directory("../FrontEnd/360_images", filename)
+
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+   
