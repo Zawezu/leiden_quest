@@ -2,12 +2,12 @@ from Map import Map
 from flask import Flask, request, jsonify, wrappers
 from flask_cors import CORS
 
-app = Flask(__name__, static_folder="FrontEnd")
+app = Flask(__name__, static_folder="static")
 CORS(app)
 
 
 # initialize the map object globally so that it can be used dynamically by the server, 
-# when frontend sends requests with updated player position
+# when static sends requests with updated player position
 # the second line is added for testing purposes and not needed for the actual server
 game = Map("map_reader/map_graph.json")
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     # @app.route("/360_images/<path:filename>")
     # def images(filename):
-    #     return send_from_directory("../FrontEnd/360_images", filename)
+    #     return send_from_directory("../static/360_images", filename)
 
     app.run(debug=True, host='0.0.0.0', port=5000)
 

@@ -146,23 +146,48 @@ class Map:
 
         return edge
 
-    def get_neighbours_and_roads(self, current: Node) -> list[tuple[Node, Road, float]]:
+    def get_neighbours_and_roads(self, root: Node) -> list[tuple[Node, Road]]:
         """
-        Finds all neighbors of a node in the graph, and combines those neighbors with the roads that lead to them.
-        Important note to remember is that tuples don't exist in json, therefore parse to tuple just in case.
+        Finds the 50 nearest neighbors of a node using breadth-first search,
+        and combines those neighbors with the roads that lead to them.
 
         :param current (Node): The current node.
-
-        :return (list): The neighbours of a node,the road connecting them, and the distance.
+        :return (list): List of tuples containing (neighbour, road_to_neighbour).
         """
-
         neighbour_and_roads: list[tuple[Node, Road]] = []
+        root: Node = tuple(root)
+        explored_neighbours = {root}
 
-        neighbour: Node
-        current: Node = tuple(current)
-        for neighbour in list(self.Graph.neighbors(current)):
-            edge: Road = Map.clean_edge(self.Graph[current][neighbour]["road"], current)
-            neighbour_and_roads.append((neighbour, edge))
+        neighbour_queue = []
+        remaining_queue = []
+        for neighbour in list(self.Graph.neighbors(root)):
+            neighbour_queue.append((root, [], neighbour, 0))
+
+        while len(neighbour_and_roads) < 50 and (neighbour_queue or remaining_queue):  # Stop if queue is empty
+            if neighbour_queue:
+                current, path_so_far, neighbour, depth = neighbour_queue.pop(0)
+                if depth > 4:
+                    remaining_queue.append((neighbour, edge, rec_neighbour, depth + 1))
+                    continue
+            else:
+                current, path_so_far, neighbour, depth = remaining_queue.pop(0)
+            print(len(neighbour_and_roads))
+            # Skip if already explored
+            if neighbour in explored_neighbours:
+                continue
+             
+            explored_neighbours.add(neighbour)
+
+            # Get the edge from current to this neighbour (direct connection in graph)
+            if neighbour in self.Graph.neighbors(current):
+                edge: Road = path_so_far + Map.clean_edge(self.Graph[current][neighbour]["road"], current)
+                neighbour_and_roads.append((neighbour, edge))
+
+            # Add all nearby neighbours to the queue
+            for rec_neighbour in list(self.Graph.neighbors(neighbour)):
+                if rec_neighbour not in explored_neighbours:
+                    neighbour_queue.append((neighbour, edge, rec_neighbour, depth + 1))
+
 
         return neighbour_and_roads
 
