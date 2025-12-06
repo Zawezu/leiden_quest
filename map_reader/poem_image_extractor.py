@@ -4,12 +4,12 @@ import json
 from urllib.parse import quote
 
 PAGE_TITLE = "Lijst_van_muurgedichten_in_Leiden"
-SAVE_FOLDER = "muurgedichten_images"
+SAVE_FOLDER = "map_reader/static/poem_images_raw"
 
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 HEADERS = {
-    "User-Agent": "LeidenPoemsImageDownloader/1.0 (your_email@example.com)"
+    "User-Agent": "LeidenPoemsImageDownloader/1.0 (nicolas.ramos.fernandez@gmail.com)"
 }
 
 # Step 1: Get page content + list of images
@@ -55,9 +55,14 @@ def get_fullres_url(filename):
             return page["imageinfo"][0]["url"]
     return None
 
+i=1
 # Step 3: Download each image
 for filename in image_files:
     print(f"\nProcessing: {filename}")
+    extension = filename.split(".")[-1]
+    print(extension)
+    if extension == "svg" or extension == "webp": # We do not want the svg or webp images
+        continue
 
     full_url = get_fullres_url(filename)
     if not full_url:
@@ -66,12 +71,14 @@ for filename in image_files:
 
     img_data = requests.get(full_url, headers=HEADERS).content
 
-    local_name = filename.replace(" ", "_")
+    local_name = str(i) + "_" + filename.replace(" ", "_")
     save_path = os.path.join(SAVE_FOLDER, local_name)
 
     with open(save_path, "wb") as f:
         f.write(img_data)
 
     print(f"  ✔ Saved: {save_path}")
+
+    i += 1
 
 print("\nDone! All available images have been downloaded.")

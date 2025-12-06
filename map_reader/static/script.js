@@ -373,21 +373,13 @@ async function loadPoemData(filepath) {
         const lng = parseFloat(row.longitude);
 
         // Build the expected image path
-        const imgPath = `static/poem_images/${row.id}.jpeg`;
-
-        // Check whether the image exists
-        const imageExists = await fetch(imgPath, { method: "HEAD" })
-            .then(res => res.ok)
-            .catch(() => false);
-
-        // Skip poem if image is missing
-        if (!imageExists) continue;
+        const imgPath = `static/poem_images/${row.id}.jpg`;
 
         // Build a safe object
         results.push({
             coords: [
-                isFinite(lat) ? lat : null,
-                isFinite(lng) ? lng : null
+                isFinite(lat) ? lat : 0,
+                isFinite(lng) ? lng : 0
             ],
             title: row.original_title +
                 (row.dutch_title && row.dutch_title !== "EMPTY"
@@ -416,14 +408,6 @@ async function loadCsvData(filepath, icon) {
 
         // Build the expected image path
         const imgPath = `static/images/${row.image}`;
-
-        // Check whether the image exists
-        const imageExists = await fetch(imgPath, { method: "HEAD" })
-            .then(res => res.ok)
-            .catch(() => false);
-
-        // Skip if image is missing
-        if (!imageExists) continue;
 
         // Build base object with required fields
         const markerObj = {
