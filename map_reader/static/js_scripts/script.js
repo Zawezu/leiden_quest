@@ -2,11 +2,9 @@ const logo = document.getElementById('logo');
 const startGame = document.getElementById('startGame');
 const content = document.querySelector('.content');
 const gameExplanation = document.querySelector('#gameExplanation');
-const panoramaContainer = document.getElementById('panoramaContainer')
 
 const resetButton = document.getElementById("reset");
 const nextRoundButton = document.getElementById("nextRoundButton");
-const openPanoramaButton = document.getElementById("openPanoramaButton");
 
 // Add onclicks 
 if (startGame) startGame.onclick = firstStart;
@@ -27,14 +25,6 @@ let questsSet = new Set();
 // Initialization of the constant game variables, the elements from the html
 const questLog = document.querySelector('#questLog');
 const infoOverlay = document.querySelector('#infoOverlay');
-
-// Initialization of the information popup for landmarks
-const modal = document.getElementById('infoModal');
-const closeModalBtn = document.getElementById('closeModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalText = document.getElementById('modalText');
-const modalImage = document.getElementById('modalImage');
-const modalBasicInfo = document.getElementById('modalBasicInfo')
 
 
 // Geting the information thorugh Flask
@@ -135,12 +125,7 @@ async function initializeGame(){
         const data = await initializeFlask();
         console.log(data);
         console.log("Data received");
-        loadData(data);
-        markerData = [];
-        placedMarkersCoords = new Set();
-        markerData = markerData.concat(await loadPoemData("static/poems_geocoded.csv"));
-        markerData = markerData.concat(await loadCsvData("static/restaurants.csv", "food_marker_icon"));
-        console.log(markerData);
+        await loadData(data);
         startNewRound();
     }
     catch(error){
@@ -148,16 +133,27 @@ async function initializeGame(){
     }
 }
 
-function loadData(data){
+async function loadData(data){
 
     // All the data gets loaded from a json dictionary (represented as an object in JS)
 
     neighbours = data["neighbours"];
     // end = data["end"]; Normally this.
-    end = [52.158751, 4.492915] // Normally not this. This is the castle coords
+    end = [0, 0] // Normally not this. This is the castle coords
     // start = data["start"];
-    start = [52.16583, 4.483413]
+    // start = [52.16583, 4.483413] // Leiden Centraal start
+    start = [52.15835, 4.493067] // Castle start
+
+    markerData = [];
+    placedMarkersCoords = new Set();
+    markerData = markerData.concat(await loadPoemData("static/poems_geocoded.csv"));
+    markerData = markerData.concat(await loadCsvData("static/restaurants.csv", "food_marker_icon"));
+    markerData = markerData.concat(await loadCsvData("static/main_landmarks.csv", "end_marker_icon"));
+    console.log(markerData);
+
     console.log("Data loaded");
+
+    
 }
 
 
@@ -214,152 +210,6 @@ function showBar(percentage, bar) {
     barText.textContent = `Progress: ${percentage}%`;
 }
 
-// Function for opening the modal
-function openModal(data) {
-    modalTitle.textContent = data.title;
-    modalText.textContent = data.text;
-    modalImage.src = data.image;
-    modal.style.display = 'flex';
-    modalBasicInfo.style.display = 'block';
-    
-    // Clear any previous additional info
-    const existingInfo = modalBasicInfo.querySelectorAll('.modalAdditionalInfo');
-    existingInfo.forEach(el => el.remove());
-    
-    // Add author if available
-    if (data.author) {
-        const authorEl = document.createElement("p");
-        authorEl.className = "modalText modalAdditionalInfo";
-        authorEl.textContent = `Author: ${data.author}`;
-        modalBasicInfo.appendChild(authorEl);
-    }
-    
-    // Add placement year if available
-    if (data.placement_year) {
-        const yearEl = document.createElement("p");
-        yearEl.className = "modalText modalAdditionalInfo";
-        yearEl.textContent = `Placement year: ${data.placement_year}`;
-        modalBasicInfo.appendChild(yearEl);
-    }
-    
-    // Add language if available
-    if (data.language) {
-        const langEl = document.createElement("p");
-        langEl.className = "modalText modalAdditionalInfo";
-        langEl.textContent = `Language: ${data.language}`;
-        modalBasicInfo.appendChild(langEl);
-    }
-    
-    // Add rating if available
-    if (data.rating) {
-        const ratingEl = document.createElement("p");
-        ratingEl.className = "modalText modalAdditionalInfo";
-        ratingEl.textContent = `Rating: ${data.rating}/5`;
-        modalBasicInfo.appendChild(ratingEl);
-    }
-    
-    if (data.questEnd) {
-        completeQuest(data.questEnd);
-    }
-    if (data.questStart) {
-        addQuest(data.questStart);
-    }
-}
-
-// Add event to close the modal when you click on the close button
-closeModalBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-    updateQuestLog();
-});
-
-// Close when clicking outside modal content
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-        updateQuestLog();
-    }
-});
-
-openPanoramaButton.addEventListener('click', () => {
-    console.log("Opening panorama");
-
-    // Ensure basic info hidden and container visible before creating viewer
-    modalBasicInfo.style.display = 'none';
-    panoramaContainer.style.display = 'block';
-
-    // Clean up any previous viewer and leftover DOM
-    if (window.panoramaViewer) {
-        try {
-            if (typeof window.panoramaViewer.dispose === 'function') {
-                window.panoramaViewer.dispose();
-            }
-        } catch (e) {
-            console.warn('Error disposing previous panoramaViewer', e);
-        }
-        try { panoramaContainer.innerHTML = ''; } catch (_) {}
-        window.panoramaViewer = null;
-    }
-
-    // Create panorama image and viewer
-    const panoramaImage = new PANOLENS.ImagePanorama("static/360_images/KPNO-Drone-360-2-CC2.jpg");
-
-    window.panoramaViewer = new PANOLENS.Viewer({
-        container: panoramaContainer,
-    });
-
-    window.panoramaViewer.add(panoramaImage);
-
-    // Request fullscreen helper (vendor fallbacks)
-    function requestFullscreen(el) {
-        if (!el) return Promise.reject(new Error('No element'));
-        if (el.requestFullscreen) return el.requestFullscreen();
-        if (el.webkitRequestFullscreen) return el.webkitRequestFullscreen();
-        if (el.mozRequestFullScreen) return el.mozRequestFullScreen();
-        if (el.msRequestFullscreen) return el.msRequestFullscreen();
-        return Promise.reject(new Error('Fullscreen API not supported'));
-    }
-
-    // Handler to dispose and hide when exiting fullscreen
-    function onFullscreenChange() {
-        const fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-        if (!fsElement) {
-            // Exit fullscreen: dispose viewer and hide container
-            if (window.panoramaViewer) {
-                try {
-                    if (typeof window.panoramaViewer.dispose === 'function') {
-                        window.panoramaViewer.dispose();
-                    }
-                } catch (e) {
-                    console.warn('Error disposing panoramaViewer on fullscreen exit', e);
-                }
-                try { panoramaContainer.innerHTML = ''; } catch (_) {}
-                window.panoramaViewer = null;
-            }
-
-            panoramaContainer.style.display = 'none';
-            modalBasicInfo.style.display = 'block';
-
-            // Remove listeners
-            document.removeEventListener('fullscreenchange', onFullscreenChange);
-            document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
-            document.removeEventListener('mozfullscreenchange', onFullscreenChange);
-            document.removeEventListener('MSFullscreenChange', onFullscreenChange);
-        }
-    }
-
-    // Add fullscreen change listeners (vendor prefixes)
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
-    document.addEventListener('mozfullscreenchange', onFullscreenChange);
-    document.addEventListener('MSFullscreenChange', onFullscreenChange);
-
-    // Request fullscreen immediately (still inside user click handler)
-    requestFullscreen(panoramaContainer)
-        .catch((err) => {
-            // If fullscreen fails, the viewer still remains visible in the page.
-            console.warn('Fullscreen request failed or not supported:', err);
-        });
-});
 
 
 async function loadPoemData(filepath) {
