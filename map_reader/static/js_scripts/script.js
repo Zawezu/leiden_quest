@@ -141,14 +141,14 @@ async function loadData(data){
     // end = data["end"]; Normally this.
     end = [0, 0] // Normally not this. This is the castle coords
     // start = data["start"];
-    // start = [52.16583, 4.483413] // Leiden Centraal start
-    start = [52.15835, 4.493067] // Castle start
+    start = [52.16583, 4.483413] // Leiden Centraal start
+    // start = [52.15835, 4.493067] // Castle start
 
     markerData = [];
     placedMarkersCoords = new Set();
     markerData = markerData.concat(await loadPoemData("static/poems_geocoded.csv"));
-    markerData = markerData.concat(await loadCsvData("static/restaurants.csv", "food_marker_icon"));
-    markerData = markerData.concat(await loadCsvData("static/main_landmarks.csv", "end_marker_icon"));
+    markerData = markerData.concat(await loadCsvData("static/restaurants.csv", "food_marker_icon", "box"));
+    markerData = markerData.concat(await loadCsvData("static/main_landmarks.csv", "end_marker_icon", "full"));
     console.log(markerData);
 
     console.log("Data loaded");
@@ -239,25 +239,29 @@ async function loadPoemData(filepath) {
             placement_year: row.placement_year || "",
             language: row.language || "",
             image: imgPath,
-            icon: "poem_marker_icon"
+            icon: "poem_marker_icon",
+            style: "box"
         });
     }
 
     return results;
 }
 
-async function loadCsvData(filepath, icon) {
+async function loadCsvData(filepath, icon, style) {
     // Load CSV using D3
     const rows = await d3.dsv(";", filepath);
 
     const results = [];
 
     for (const row of rows) {
+        
         const latitude = parseFloat(row.latitude);
         const longitude = parseFloat(row.longitude);
 
         // Build the expected image path
         const imgPath = `static/images/${row.image}`;
+        const imgPath2 = `static/images/${row.image2}` || '';
+        const imgPath3 = `static/images/${row.image3}` || '';
 
         // Build base object with required fields
         const markerObj = {
@@ -266,13 +270,16 @@ async function loadCsvData(filepath, icon) {
                 isFinite(longitude) ? longitude : null
             ],
             image: imgPath,
-            icon: icon
+            image2: imgPath2,
+            image3: imgPath3,
+            icon: icon,
+            style: style
         };
 
         // Dynamically add all other columns from the CSV
         for (const [key, value] of Object.entries(row)) {
             // Skip the columns we've already processed
-            if (!['latitude', 'longitude', 'image'].includes(key)) {
+            if (!['latitude', 'longitude', 'image', 'image2', 'image3'].includes(key)) {
                 markerObj[key] = value;
             }
         }

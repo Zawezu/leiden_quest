@@ -171,7 +171,7 @@ class Map:
                     continue
             else:
                 current, path_so_far, neighbour, depth = remaining_queue.pop(0)
-            print(len(neighbour_and_roads))
+            # print(len(neighbour_and_roads))
             # Skip if already explored
             if neighbour in explored_neighbours:
                 continue

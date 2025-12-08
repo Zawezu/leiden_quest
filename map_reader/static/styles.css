@@ -238,3 +238,102 @@ div.barText {
     transform-origin: center bottom;
     transition: transform 0.45s cubic-bezier(.25, 1.5, .5, 1); 
 }
+
+/* Fullscreen modal wrapper */
+.modal.full-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+}
+
+/* Fullscreen image (cover) */
+.modal.full-modal .modalImage.full {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 10000;
+}
+
+/* Subtle overlay shade to improve contrast */
+.modalOverlayShade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.25);
+  z-index: 10001;
+  pointer-events: none;
+}
+
+/* Fullscreen info box (bottom-left) */
+.modalFullInfo {
+  position: absolute;
+  left: 40px;
+  bottom: 40px;
+  max-width: 48%;
+  color: #fff;
+  z-index: 10005;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  font-size: large;
+  line-height: 1.5em;
+}
+
+/* Centered arrow buttons on left/right */
+.modalArrowLeft,
+.modalArrowRight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10006;
+  background: rgba(0,0,0,0.35);
+  border: none;
+  color: #000000;
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #e6e6e6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.modalArrowLeft { 
+    left: 20px;
+    margin-left: -2px; 
+}
+.modalArrowRight { 
+    right: 20px; 
+    margin-left: 2px;
+}
+
+/* Fullscreen close button positioning */
+.modal.full-modal .closeModalBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 10010;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e6e6e6
+
+}
+
+/* Ensure modalContent inside modal has proper stacking for standard modal */
+.modal .modalContent {
+  position: relative;
+  z-index: 10005;
+}
