@@ -4,7 +4,7 @@ import json
 from urllib.parse import quote
 
 PAGE_TITLE = "Lijst_van_muurgedichten_in_Leiden"
-SAVE_FOLDER = "map_reader/static/poem_images_raw"
+SAVE_FOLDER = "website/static/poem_images_raw"
 
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 

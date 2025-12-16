@@ -4,7 +4,7 @@ from geopy.extra.rate_limiter import RateLimiter
 import time
 
 # Load your CSV
-df = pd.read_csv("map_reader/static/poems_raw.csv", sep=";", index_col=0)  # assumes column "address"
+df = pd.read_csv("website/static/poems_raw.csv", sep=";", index_col=0)  # assumes column "address"
 
 # Initialize geocoder
 geolocator = Nominatim(user_agent="leiden_poems_map")
@@ -46,5 +46,5 @@ for i, row in df.iterrows():
     time.sleep(1.2)  # be polite to the server
 
 # Save results
-df.to_csv("map_reader/static/poems_geocoded.csv", sep=";")
+df.to_csv("website/static/poems_geocoded.csv", sep=";")
 print("Geocoding complete!")

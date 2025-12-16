@@ -147,7 +147,7 @@ def build_final_name(index, ext, padding):
 padding = 0
 dry_run = False
 
-directory = "map_reader/static/poem_images"
+directory = "website/static/poem_images"
 if not os.path.isdir(directory):
     print(f"Directory not found: {directory}", file=sys.stderr)
     sys.exit(2)

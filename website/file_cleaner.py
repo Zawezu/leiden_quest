@@ -244,4 +244,4 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
 
 
 if __name__ == '__main__':
-    file_cleaner("map_reader/raw_map_data.geojson", "map_reader/map_graph.json")
+    file_cleaner("website/raw_map_data.geojson", "website/map_graph.json")
