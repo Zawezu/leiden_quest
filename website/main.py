@@ -1,4 +1,4 @@
-from website.map import Map
+from .map import Map
 from flask import Flask, request, jsonify, wrappers
 from flask_cors import CORS
 import os
