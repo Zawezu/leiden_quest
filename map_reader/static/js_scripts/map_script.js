@@ -1,7 +1,7 @@
 // Initialise the map
 // let map = L.map('map', {maxZoom: 18, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 15, center: [52.1581218,4.4855674]});
-let map = L.map('map', {maxZoom: 18, minZoom:18, zoom: 18, center: [52.1581218,4.4855674],
-                        // dragging: false, doubleClickZoom: false, boxZoom: false, zoomControl: false, 
+let map = L.map('map', {maxZoom: 18, minZoom:18, zoom: 18, center: [52.1581218,4.4855674], zoomControl: false, attributionControl: false,
+                        // dragging: false, doubleClickZoom: false, , zoomControl: false, 
                         updateWhenIdle: false, maxBounds: [[52.13, 4.455],[52.19, 4.53]]});
 
 
@@ -48,6 +48,123 @@ playerIcon = L.icon({
     popupAnchor: [5, 5]
 });
 
+// Arrow marker (a DivIcon with inline SVG) that will be centered on the player and rotated
+let playerArrow = null;
+let endLatLng = null;
+
+/**
+ * Create a centered arrow marker attached to the map. The arrow is a div containing an SVG
+ * so we can rotate it via CSS transform. The marker will be centered on the player (iconAnchor at center).
+ * @param {L.Marker} centerMarker - the player marker to center the arrow on
+ * @param {Object} [opts] - options {size: number}
+ * @returns {L.Marker} the created arrow marker
+ */
+function createPlayerArrow(centerMarker, opts = {}) {
+                // Center the icon on the player's latlng; the arrow graphic will be displaced forward
+                // using CSS transform so it appears to move away from the player in the bearing direction.
+                const arrowVisualSize = opts.arrowSize || 32; // visual SVG size in px (thinner by default)
+                const forwardOffset = (typeof opts.offset === 'number') ? opts.offset : 20; // px to move forward from player
+
+                // total icon area must include room for forward offset in any direction
+                const total = arrowVisualSize + forwardOffset * 2;
+                const half = Math.floor(total / 2);
+
+                const svg = `
+                    <div class="player-arrow" style="width:${total}px;height:${total}px;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+                        <svg width="${arrowVisualSize}" height="${arrowVisualSize}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transform-origin:50% 50%;">
+                            <polygon points="12,2 9,20 12,14 15,20" fill="#e63946" stroke="#000" stroke-width="0.5" />
+                        </svg>
+                    </div>`;
+
+                const icon = L.divIcon({
+                        className: 'player-arrow-wrapper',
+                        html: svg,
+                        iconSize: [total, total],
+                        iconAnchor: [half, half]
+                });
+
+                playerArrow = L.marker(centerMarker.getLatLng(), {icon: icon, interactive: false, zIndexOffset: 1500}).addTo(map);
+                // store forwardOffset so pointArrowToward can use the same value
+                playerArrow._forwardOffset = forwardOffset;
+}
+
+/**
+ * Calculate the bearing (degrees clockwise from north) between two LatLngs.
+ * Uses formula for initial bearing between two geographic coordinates.
+ * @param {L.LatLng} from
+ * @param {L.LatLng} to
+ * @returns {number} bearing in degrees (0-360)
+ */
+function bearingDegrees(from, to) {
+    const lat1 = from.lat * Math.PI / 180;
+    const lat2 = to.lat * Math.PI / 180;
+    const dLon = (to.lng - from.lng) * Math.PI / 180;
+
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    let brng = Math.atan2(y, x) * 180 / Math.PI; // in degrees
+    brng = (brng + 360) % 360; // normalize
+    return brng;
+}
+
+/**
+ * Rotate the arrow marker so it points from the arrow's position towards the target LatLng.
+ * @param {L.LatLng} targetLatLng
+ */
+function pointArrowToward(targetLatLng) {
+    console.log("Arrow marker: ");
+    console.log(playerArrow)
+    console.log("Target: " + targetLatLng);
+    if (!playerArrow) return;
+    const el = playerArrow.getElement();
+    if (!el) return; // element not yet on DOM
+
+    // Rotate the inner SVG so the arrow graphic faces the target.
+    const inner = el.querySelector && el.querySelector('.player-arrow');
+    const svgChild = inner && inner.querySelector('svg');
+    const targetEl = svgChild || inner || el;
+
+    const from = playerArrow.getLatLng();
+    const brng = bearingDegrees(from, targetLatLng);
+    // get forward offset from marker (px). default if missing
+    const forward = (playerArrow && playerArrow._forwardOffset) ? playerArrow._forwardOffset : 20;
+    // rotate then translate forward in local coordinates (translate uses rotated axes)
+    try {
+        targetEl.style.transformOrigin = '50% 50%';
+        targetEl.style.transform = `rotate(${brng}deg) translate(0, -${forward}px)`;
+    } catch (e) {
+        console.warn('Could not rotate/translate arrow element', e);
+    }
+}
+
+// Stored target for the arrow; call `setArrowTarget(latlng)` to update
+let arrowTarget = null;
+
+/**
+ * Set the arrow's target and immediately rotate it toward that LatLng.
+ * @param {L.LatLng|Array|Object} latlng
+ */
+// function setArrowTarget(latlng) {
+//     if (!latlng) { arrowTarget = null; return; }
+//     console.log(latlng);
+//     console.log(latlng[0] + ", " + latlng[1]);
+//     arrowTarget = L.LatLng(latlng[0], latlng[1]);
+//     console.log(playerArrow + ", " + arrowTarget);
+//     if (playerArrow && latlng) {
+//         // console.log("Setting target to " + latlng);
+//         pointArrowToward(arrowTarget);
+//     }
+// }
+
+/**
+ * Convenience: set the arrow target (works with arrays, L.LatLng or {lat,lng})
+ * @param {Array|Object|L.LatLng} latlng
+ */
+function setArrowTarget(latlng) {
+    if (!latlng) { endLatLng = null; return; }
+    endLatLng = L.latLng(latlng);
+    if (playerArrow && endLatLng) pointArrowToward(endLatLng);
+}
 
 // const markerData = [
 //     {
@@ -99,7 +216,7 @@ playerIcon = L.icon({
 // This function declares the necessary variables for the display and functionality of lines and nodes in the map. It is passed  at the start of a round
 function startNewRound() {
     startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
-    endMarker = L.marker(end, {icon: endIcon, zIndexOffset: -999}).addTo(map).bindPopup("End");
+    // endMarker = L.marker(end, {icon: endIcon, zIndexOffset: -999}).addTo(map).bindPopup("End");
 
     edgeMarker = L.marker(end, {icon: endIcon, zIndexOffset: -998}).addTo(map).bindPopup("");
 
@@ -111,19 +228,30 @@ function startNewRound() {
     currentPosition = start;
     neighbourMarkers = [];
     playerMarker = L.marker(currentPosition, {icon: playerIcon}).addTo(map).bindPopup("Current position");
+
     requestNeighbours(start);
 
 
     // map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]}); // Before, this line set the view so the start and end nodes both on screen
     // map.setMinZoom(14);
     map.setView(currentPosition) // Not the view centers over the player
+
+    // create and position the arrow centered on the player
+    if (playerArrow) { playerArrow.remove(); }
+    createPlayerArrow(playerMarker);
+    // Default arrow target: point to end marker if available
+
+    // setArrowTarget(end);
+    endLatLng = L.latLng(end)
+    pointArrowToward(endLatLng);
+
 }
 
 // Clear the variables from the map so that they can be remade in the new round
 function clearMap() {
     startMarker.remove();
     playerMarker.remove();
-    endMarker.remove();
+    // endMarker.remove();
     pathLine.remove();
     neighbourMarkers.forEach(function(marker) {marker.remove()});
     console.log("Cleared map")
@@ -189,7 +317,10 @@ function checkMarkerDistances() {
                 const markerDistance = map.distance(comparisonPosition, markerDatum.coords);
                 if (markerDistance < VISIBILITY_RADIUS & !placedMarkersCoords.has(markerDatum.coords)) {
                     animatePlaceMarker(markerDatum);
-                    placedMarkersCoords.add(markerDatum.coords);                    
+                    placedMarkersCoords.add(markerDatum.coords);  
+                    numPlacedMarkers += 1
+                    console.log("Current progress: " + numPlacedMarkers + "/" + markerData.length)
+                    showBar(numPlacedMarkers / markerData.length * 100)                  
                 }
                 // marker._data.push()
             });
@@ -255,7 +386,7 @@ function animatePlaceMarker(markerDatum, finalIconSize = [32, 40], mapInstance =
 
 function endRound() {
     map.setMinZoom(13);
-    map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]});
+    map.fitBounds([startMarker.getLatLng(), end], {padding: [0.4, 0.4]});
     pathLine.setLatLngs(detailedPath);
     pathLine.addTo(map);
     neighbourMarkers.forEach(function(marker) {marker.remove()});
@@ -273,9 +404,18 @@ function animatePlayer(marker, from, to, duration, callback) {
         // Linear interpolation
         const lat = from[0] + (to[0] - from[0]) * t;
         const lng = from[1] + (to[1] - from[1]) * t;
-        // console.log(marker.getLatLng())
         marker.setLatLng([lat, lng]);
         map.setView([lat, lng]);
+
+        // Keep arrow centered on the player and rotate toward target if set
+        if (playerArrow) {
+            try {
+                playerArrow.setLatLng([lat, lng]);
+                if (endLatLng) pointArrowToward(endLatLng);
+            } catch (e) {
+                console.warn('Arrow update failed', e);
+            }
+        }
 
         if (t < 1) {
             requestAnimationFrame(animate);
@@ -294,19 +434,18 @@ function moveAlongPositions(marker, path) {
                 // xDist = path[index][0] - path[index+1][0];
                 // yDist = path[index][1] - path[index+1][1];
                 // dist = Math.sqrt(xDist**2 + yDist**2);
-                console.log(index)
+                // console.log(index)
                 if (index % 5 == 0) {
                     checkMarkerDistances()
                 }
                 dist = map.distance(path[index], path[index+1]);
-                console.log(dist)
+                // console.log(dist)
                 animatePlayer(marker, path[index], path[index + 1], dist*MOVEMENT_SLOWNESS, () => {
                     step(index + 1);
                 });
                 
             } else {
                 checkMarkerDistances();
-                updateEdgeMarker();
                 resolve()
             }
         }
@@ -318,58 +457,3 @@ function clamp(x, min, max) {
     return Math.max(min, Math.min(x, max));
 }
 
-function updateEdgeMarker() {
-    const bounds = map.getBounds();
-    const realMarkerLatLng = endMarker.getLatLng();
-
-    // If real marker is in view → hide edge marker
-    if (bounds.contains(realMarkerLatLng)) {
-        edgeMarker.setOpacity(0);
-        return;
-    }
-
-    const mapSize = map.getSize();
-    const center = map.getCenter();
-
-    const centerPt = map.latLngToContainerPoint(center);
-    const markerPt = map.latLngToContainerPoint(realMarkerLatLng);
-
-    const dx = markerPt.x - centerPt.x;
-    const dy = markerPt.y - centerPt.y;
-
-    const slope = dy / dx;
-
-    let x, y;
-    const padding = 30; // distance from edge to place the marker
-
-    // Determine whether the line hits vertical or horizontal edge first
-    if (Math.abs(slope) < mapSize.y / mapSize.x) {
-        // Hits left or right edge first
-        if (dx > 0) {
-            x = mapSize.x - padding; // right edge
-            y = centerPt.y + slope * (x - centerPt.x);
-        } else {
-            x = padding; // left edge
-            y = centerPt.y + slope * (x - centerPt.x);
-        }
-    } else {
-        // Hits top or bottom
-        if (dy > 0) {
-            y = mapSize.y - padding; // bottom
-            x = centerPt.x + (y - centerPt.y) / slope;
-        } else {
-            y = padding; // top
-            x = centerPt.x + (y - centerPt.y) / slope;
-        }
-    }
-
-    // Clamp within map container
-    x = clamp(x, padding, mapSize.x - padding);
-    y = clamp(y, padding, mapSize.y - padding);
-
-    // Convert container point → lat/lng and move fake marker
-    const latlng = map.containerPointToLatLng([x, y]);
-
-    edgeMarker.setLatLng(latlng);
-    edgeMarker.setOpacity(1); // show edge marker
-}

@@ -128,25 +128,33 @@ input[type="number"]{
 /* Progress Bar Container */
 #progressBarContainer {
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: 90%;
+    left: 5%;
     transform: translate(-50%, -50%);
-    width: 60%;
+    width: 100px;
+    max-width: 10%;
     text-align: center;
     z-index: 1000;
     display: none;
-    background: rgba(255, 255, 255, 0.9);
+    /* background: rgba(255, 255, 255, 0.9); */
     border: 2px solid #000000e2;
     border-radius: 8px;
-    padding: 20px;
+    padding: 10px 20px 10px 20px;
     border-radius: 8px;
+    background: rgba(255,255,255,0.548);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    height: fit-content;
 }
+
 
 
 div.bar {
     width: 100%;
     background-color: #e0e0e0;
-    border-radius: 8px;
+    border-radius: 8px 0 0 8px;
     overflow: hidden;
     height: 20px;
     margin-bottom: 10px;
@@ -164,7 +172,7 @@ div.barFill {
 
 /* Progress Text */
 div.barText {
-    font-size: 16px;
+    font-size: 8px;
     font-weight: bold;
     color: #333;
 }
@@ -175,71 +183,117 @@ div.barText {
 }
 
 
-/* Styles for the window popups */
+/* === Modal: base === */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 9000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
+  display: none;
+  position: fixed;
+  z-index: 9000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.205);
+  justify-content: center;
+  align-items: center;
 }
 
-/* Modal content box */
+/* Modal content (box) */
 .modalContent {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 80%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    text-align: center;
+  position: relative;
+  background: rgba(255,255,255,0.548);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 20px;
+  border-radius: 20px;
+  width: 40%;
+  max-width: 400px;
+  max-height: 80%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: left;
+  box-sizing: border-box;
 }
 
+/* Ensure modalContent contains children and wrapper scrolls inside */
+.modalContent {
+  max-width: 900px;
+  width: calc(100% - 6vw);
+  max-height: 90vh;
+  overflow: hidden; /* contains visual overflow; wrapper will scroll if needed */
+  box-sizing: border-box;
+}
+
+/* Wrapper scroll area: ensures text never escapes the modal box */
+.modalContentWrapper {
+  overflow: auto;
+  max-height: calc(90vh - 120px); /* leaves room for header + padding; adjust if needed */
+  box-sizing: border-box;
+  padding-bottom: 8px;
+}
+
+/* internal wrapper can scroll when vertical stacked content exceeds available height */
+.modalContentWrapper {
+  overflow: auto;
+  padding-bottom: 12px;
+  box-sizing: border-box;
+}
+
+/* constrain the inline image so it never grows beyond the wrapper */
+.modalImage {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Close button - common */
 .closeModalBtn {
-    font-size: 22px;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.2s;
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: #1d1d1d;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 6px;
 }
 
-.closeModalBtn:hover {
-    background: #c0392b;
+/* Hover style (box modal) */
+.modalContent .closeModalBtn:hover {
+  background: #c0392b;
+  color: #fff;
 }
 
-.modal img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-top: 10px;
+/* Full-modal specific close styling (class added by JS) */
+.modal.full-modal .closeModalBtn.closeModalBtn--full {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 10070;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
+/* === Panorama container (shared) === */
 .panoramaContainer {
-    display: none;
-    width: 80%;
-    max-width: 1000px;
-    height: 60vh;
-    min-height: 420px;
-    background-color: #000;
-    border-radius: 8px;
-    margin-top: 10px;
-    overflow: hidden;
-    align-self: center;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
-    position: relative;
+  display: none;
+  width: 80%;
+  max-width: 1000px;
+  height: 60vh;
+  min-height: 420px;
+  background-color: #000;
+  border-radius: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  align-self: center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  position: relative;
+  z-index: 10012;
 }
 
-.pop-marker {
-    transform-origin: center bottom;
-    transition: transform 0.45s cubic-bezier(.25, 1.5, .5, 1); 
-}
-
-/* Fullscreen modal wrapper */
+/* === Fullscreen modal: unified rules === */
 .modal.full-modal {
   display: flex;
   justify-content: center;
@@ -250,21 +304,11 @@ div.barText {
   width: 100%;
   height: 100%;
   z-index: 10000;
+  overflow: hidden;
 }
 
-/* Fullscreen image (cover) */
-.modal.full-modal .modalImage.full {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 10000;
-}
-
-/* Subtle overlay shade to improve contrast */
-.modalOverlayShade {
+/* overlay shade */
+.modal.full-modal .modalOverlayShade {
   position: absolute;
   left: 0;
   top: 0;
@@ -275,7 +319,25 @@ div.barText {
   pointer-events: none;
 }
 
-/* Fullscreen info box (bottom-left) */
+/* image track (covers viewport) */
+.modalFullSlidesTrack {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  transition: transform 480ms cubic-bezier(.22,.9,.35,1);
+  z-index: 10000;
+  will-change: transform;
+}
+.modalFullSlidesTrack .slideImage {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+/* info container (bottom-left) overlaying the images */
 .modalFullInfo {
   position: absolute;
   left: 40px;
@@ -284,56 +346,175 @@ div.barText {
   color: #fff;
   z-index: 10005;
   text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-  font-size: large;
+  font-size: 1.05rem;
   line-height: 1.5em;
+  pointer-events: auto; /* allow interaction for buttons inside */
 }
 
-/* Centered arrow buttons on left/right */
-.modalArrowLeft,
-.modalArrowRight {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10006;
+/* text track (holds full-width text slide placeholders so transforms remain in sync) */
+.modalFullTextTrack {
+  display: flex;
+  transition: transform 420ms cubic-bezier(.22,.9,.35,1);
+  will-change: transform;
+}
+/* each textSlide is full-viewport width so translations match vw-based image track */
+.modalFullTextTrack .textSlide {
+  min-width: 100vw;
+  box-sizing: border-box;
+  display: block;
+}
+
+/* Text inner wrapper and visible text box on the left */
+.textSlideInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end; /* keep text near bottom */
+  box-sizing: border-box;
+}
+.textBox {
+  width: 48%;
+  max-width: 48%;
+  padding: 24px;
+  padding-right: 2rem;
+  box-sizing: border-box;
   background: rgba(0,0,0,0.35);
-  border: none;
-  color: #000000;
-  font-size: 32px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: #e6e6e6;
-  cursor: pointer;
+  color: #fff;
+  border-radius: 6px;
+}
+
+/* ensure modal title/text contrast inside info container */
+.modalFullInfo .modalTitle,
+.modalFullInfo .modalText {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* === Arrow buttons (authoritative, viewport-fixed to avoid clipping) === */
+.modal.full-modal .modalArrowLeft,
+.modal.full-modal .modalArrowRight {
+  position: fixed !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10060 !important;               /* above images/overlay */
+  background: rgba(0,0,0,0.60) !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 24px !important;
+  width: 56px !important;
+  height: 56px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45) !important;
+  transition: background 150ms ease !important;
+}
+.modal.full-modal .modalArrowLeft:hover,
+.modal.full-modal .modalArrowRight:hover {
+  background: rgba(0,0,0,0.75) !important;
+}
+.modal.full-modal .modalArrowLeft { left: 18px !important; }
+.modal.full-modal .modalArrowRight { right: 18px !important; }
+
+/* small accessibility improvements for arrow icons */
+.modal.full-modal .modalArrowLeft,
+.modal.full-modal .modalArrowRight {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* === Box modal header: icon + title (flex) === */
+.modalHeader {
   display: flex;
   align-items: center;
-  justify-content: center;
-  outline: none;
+  gap: 12px;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+.modalHeader .modalIcon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex: 0 0 48px;
+}
+.modalHeader .modalTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  text-align: left;
 }
 
-.modalArrowLeft { 
-    left: 20px;
-    margin-left: -2px; 
-}
-.modalArrowRight { 
-    right: 20px; 
-    margin-left: 2px;
-}
-
-/* Fullscreen close button positioning */
-.modal.full-modal .closeModalBtn {
+/* Ensure close button in box modal is positioned top-right inside .modalContent */
+.modalContent .closeModalBtn {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 12px;
+  right: 12px;
   z-index: 10010;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #e6e6e6
-
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
 }
 
-/* Ensure modalContent inside modal has proper stacking for standard modal */
-.modal .modalContent {
-  position: relative;
-  z-index: 10005;
+/* make sure images inside regular modals are not too large */
+.modal img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* small helpers */
+.pop-marker {
+  transform-origin: center bottom;
+  transition: transform 0.45s cubic-bezier(.25,1.5,.5,1);
+}
+
+/* keep panorama container layering safe inside modal */
+.panoramaContainer { z-index: 10012; }
+
+/* Wrapper and side-layout helpers for box modal */
+.modalContentWrapper { display: flex; flex-direction: column; gap: 12px; }
+.modalBody { display: block; box-sizing: border-box; }
+
+/* Side layout modifier: image left, body right */
+.modalContent.modalContent--side .modalContentWrapper { flex-direction: row; align-items: flex-start; gap: 20px; }
+.modalContent.modalContent--side .modalImage { flex: 0 0 60%; max-height: 80vh; object-fit: cover; }
+.modalContent.modalContent--side .modalBody { flex: 1 1 auto; min-width: 0; }
+
+/* Ensure modal header sits correctly inside body */
+.modalBody .modalHeader { margin-bottom: 12px; }
+
+/* Side mode: layout and overflow control */
+.modalContent.modalContent--side {
+  display: block; /* keep modalContent normal; wrapper controls layout */
+}
+.modalContent.modalContent--side .modalContentWrapper {
+  max-height: 70vh;     /* ensure wrapper doesn't overflow modal box */
+  overflow: auto;
+}
+
+/* When side layout active, image column constrained and body scrolls if needed */
+.modalContent.modalContent--side .modalImage {
+  width: 55%;
+  max-width: 55%;
+  max-height: 70vh;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.modalContent.modalContent--side .modalBody {
+  width: 45%;
+  min-width: 0;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* Keep header visually above wrapper: small spacing */
+.modalHeader {
+  z-index: 2;
+  margin-bottom: 12px;
+  background: transparent;
 }

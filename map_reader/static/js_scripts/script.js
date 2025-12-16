@@ -4,12 +4,15 @@ const content = document.querySelector('.content');
 const gameExplanation = document.querySelector('#gameExplanation');
 
 const resetButton = document.getElementById("reset");
-const nextRoundButton = document.getElementById("nextRoundButton");
+
+const barContainer = document.getElementById("progressBarContainer");
+const barFill = document.getElementById("progressFill");
+const barText = document.getElementById("progressText");
 
 // Add onclicks 
 if (startGame) startGame.onclick = firstStart;
 if (resetButton) resetButton.onclick = resetGame;
-if (nextRoundButton) nextRoundButton.onclick = nextRound;
+
 
 // The game logic
 
@@ -95,16 +98,19 @@ function resetGame() {
 }
 
 function firstStart() {
-    // This function hides the game explanation and starts the game
+    // This function hides the game explanation, shows the progress bar, and starts the game
 
     gameExplanation.style.display = "none";
     infoOverlay.style.display = "block";
+
+    barContainer.style.display = 'block';
+    barFill.style.width = "0";
+    barFill.style.backgroundColor = "red";
     initializeGame();
 }
 
 function nextRound() {
     // This function gets called when the next round button is clicked
-    // Work in progress. For now just brings you to the next round
 
     clearMap();
     initializeGame();
@@ -139,19 +145,21 @@ async function loadData(data){
 
     neighbours = data["neighbours"];
     // end = data["end"]; Normally this.
-    end = [0, 0] // Normally not this. This is the castle coords
+    end = [52.15896289011223, 4.492492679291971] // Normally not this. This is the castle coords
     // start = data["start"];
     start = [52.16583, 4.483413] // Leiden Centraal start
     // start = [52.15835, 4.493067] // Castle start
 
     markerData = [];
     placedMarkersCoords = new Set();
-    markerData = markerData.concat(await loadPoemData("static/poems_geocoded.csv"));
-    markerData = markerData.concat(await loadCsvData("static/restaurants.csv", "food_marker_icon", "box"));
-    markerData = markerData.concat(await loadCsvData("static/main_landmarks.csv", "end_marker_icon", "full"));
+    numPlacedMarkers = 0;
+
+    markerData = markerData.concat(await loadPoemData("static/csv_files/poems_geocoded.csv"));
+    markerData = markerData.concat(await loadCsvData("static/csv_files/restaurants.csv", "food_marker_icon", "box"));
+    markerData = markerData.concat(await loadCsvData("static/csv_files/main_landmarks.csv", "end_marker_icon", "full"));
     console.log(markerData);
 
-    console.log("Data loaded");
+    console.log(markerData.length + " markers added");
 
     
 }
@@ -180,20 +188,11 @@ function updateQuestLog() {
 }
 
 
-function showBar(percentage, bar) {
+function showBar(percentage) {
 
     // This function is a WIP to show the progress done so far
 
-    // Variables for the elements of the progress bar
-
-    const barContainer = document.getElementById(bar+"BarContainer");
-    const barFill = document.getElementById(bar+"Fill");
-    const barText = document.getElementById(bar+"Text");
-
-    barContainer.style.display = 'block';
-
-    barFill.style.width = "0";
-    barFill.style.backgroundColor = "red";
+    // Variables for the elements of the progress bar    
 
     setTimeout(() => {
         barFill.style.width = `${percentage}%`;
@@ -207,7 +206,7 @@ function showBar(percentage, bar) {
         }
     }, 100);
 
-    barText.textContent = `Progress: ${percentage}%`;
+    // barText.textContent = `Progress: ${percentage}%`;
 }
 
 
