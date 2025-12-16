@@ -39,7 +39,8 @@ async function initializeFlask() {
 
     const start = {"type": "start"}
     try{
-        const response = await fetch('http://127.0.0.1:8000/main',{
+        // const response = await fetch('http://127.0.0.1:8000/main',{
+        const response = await fetch('/main',{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -66,7 +67,8 @@ async function requestNeighbours(coords) {
 
     const send_neighbours = {"type": "neighbours", "current": coords}
     try{
-        const response = await fetch('http://127.0.0.1:8000/main',{
+        // const response = await fetch('http://127.0.0.1:8000/main',{
+        const response = await fetch('/main',{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'

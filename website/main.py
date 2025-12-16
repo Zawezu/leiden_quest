@@ -59,14 +59,14 @@ def main()-> tuple[wrappers.Response, int] | wrappers.Response:
     return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400
 
 
-if __name__ == "__main__":
-    # run the server, open it on all ports
+# if __name__ == "__main__":
+#     # run the server, open it on all ports
 
 
-    # @app.route("/360_images/<path:filename>")
-    # def images(filename):
-    #     return send_from_directory("../static/360_images", filename)
-    port = int(os.environ.get("PORT", 8000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+#     # @app.route("/360_images/<path:filename>")
+#     # def images(filename):
+#     #     return send_from_directory("../static/360_images", filename)
+#     port = int(os.environ.get("PORT", 8000))
+#     app.run(debug=True, host='0.0.0.0', port=port)
 
    
