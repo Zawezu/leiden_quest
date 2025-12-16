@@ -43,7 +43,7 @@ COPY . .
 ENV FLASK_APP=main.py
 
 # expose the port Flask will run on
-EXPOSE 5000
+EXPOSE 8000
 
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
