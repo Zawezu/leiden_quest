@@ -17,28 +17,36 @@
     height: 350px;
     margin-bottom: 20px;
 }
-#startGame {
-    text-align: center;
-    margin: auto;
-}
+
 #title {
     font-size: 2.5em;
     font-weight: bold;
 }
 
 #startGame {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 50%;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 auto;
+  display: inline-block;
+  text-align: center;
+  margin: auto;
 }
 .hidden {
     display: none;
 }
 
+#gameExplanation .content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 600px;
+}
+
 #gameExplanation .content > * {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 #map{

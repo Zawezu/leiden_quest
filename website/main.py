@@ -1,4 +1,5 @@
 from .map import Map
+# from map import Map
 from flask import Flask, request, jsonify, wrappers
 from flask_cors import CORS
 import os
@@ -66,7 +67,7 @@ def main()-> tuple[wrappers.Response, int] | wrappers.Response:
 #     # @app.route("/360_images/<path:filename>")
 #     # def images(filename):
 #     #     return send_from_directory("../static/360_images", filename)
-#     port = int(os.environ.get("PORT", 8000))
+#     port = int(os.environ.get("PORT", 10000))
 #     app.run(debug=True, host='0.0.0.0', port=port)
 
    
