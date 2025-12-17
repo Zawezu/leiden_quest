@@ -32,14 +32,6 @@ startIcon = L.icon({
     popupAnchor:  [16, 48]
 });
 
-// Create endIcon
-endIcon = L.icon({
-    iconUrl: 'static/marker_icons/end_marker_icon.webp',
-    iconSize: [32, 48],
-    iconAnchor: [16, 48],
-    popupAnchor:  [16, 48]
-});
-
 // Create playerIcon
 playerIcon = L.icon({
     iconUrl: 'static/marker_icons/player_icon.webp',
@@ -107,16 +99,15 @@ function bearingDegrees(from, to) {
     return brng;
 }
 
-/**
- * Rotate the arrow marker so it points from the arrow's position towards the target LatLng.
- * @param {L.LatLng} targetLatLng
- */
-function pointArrowToward(targetLatLng) {
-    console.log("Arrow marker: ");
-    console.log(playerArrow)
-    console.log("Target: " + targetLatLng);
+
+function pointArrow() {
+    // console.log("Arrow marker: ");
+    // console.log(playerArrow);
+    console.log("Target: " + end);
+    arrowTarget = L.latLng(end);
     if (!playerArrow) return;
     const el = playerArrow.getElement();
+    // console.log("el: " + el)
     if (!el) return; // element not yet on DOM
 
     // Rotate the inner SVG so the arrow graphic faces the target.
@@ -125,7 +116,8 @@ function pointArrowToward(targetLatLng) {
     const targetEl = svgChild || inner || el;
 
     const from = playerArrow.getLatLng();
-    const brng = bearingDegrees(from, targetLatLng);
+    const brng = bearingDegrees(from, arrowTarget);
+    // console.log(brng);
     // get forward offset from marker (px). default if missing
     const forward = (playerArrow && playerArrow._forwardOffset) ? playerArrow._forwardOffset : 20;
     // rotate then translate forward in local coordinates (translate uses rotated axes)
@@ -137,88 +129,14 @@ function pointArrowToward(targetLatLng) {
     }
 }
 
-// Stored target for the arrow; call `setArrowTarget(latlng)` to update
-let arrowTarget = null;
-
-/**
- * Set the arrow's target and immediately rotate it toward that LatLng.
- * @param {L.LatLng|Array|Object} latlng
- */
-// function setArrowTarget(latlng) {
-//     if (!latlng) { arrowTarget = null; return; }
-//     console.log(latlng);
-//     console.log(latlng[0] + ", " + latlng[1]);
-//     arrowTarget = L.LatLng(latlng[0], latlng[1]);
-//     console.log(playerArrow + ", " + arrowTarget);
-//     if (playerArrow && latlng) {
-//         // console.log("Setting target to " + latlng);
-//         pointArrowToward(arrowTarget);
-//     }
-// }
-
-/**
- * Convenience: set the arrow target (works with arrays, L.LatLng or {lat,lng})
- * @param {Array|Object|L.LatLng} latlng
- */
-function setArrowTarget(latlng) {
-    if (!latlng) { endLatLng = null; return; }
-    endLatLng = L.latLng(latlng);
-    if (playerArrow && endLatLng) pointArrowToward(endLatLng);
+function changeEnd(newEnd) {
+    end = newEnd;
+    pointArrow();
 }
-
-// const markerData = [
-//     {
-//     coords: [52.161970089412556, 4.484630945127542],
-//     title: "El Gaucho",
-//     text: "Delicious empanadas",
-//     image: "static/images/empanadas.jpeg",
-//     questStart: "Eat empanadas",
-//     },
-//     {
-//     coords: [52.16294805799125, 4.484440664829482],
-//     title: "X falafel",
-//     text: "Crispy kip",
-//     image: "static/images/X-Falafel.png",
-//     },
-//     {
-//     coords: [52.16284763059071, 4.484968637263583],
-//     title: "M Noodle Bar",
-//     text: "Tasty ramen",
-//     image: "static/images/ramen.jpg.webp",
-//     questStart: "Go to the pancake place",
-//     },
-//     {
-//     coords: [52.16286256892617, 4.485263831974263],
-//     title: "Pannenkoekenhuis de Schaapsbel",
-//     text: "Delicious pancakes",
-//     image: "static/images/pancakes.jpg",
-//     questEnd: "Go to the pancake place"
-//     },
-//     {
-//     coords: [52.15852231740921, 4.4913050545237905],
-//     title: "Visfontein",
-//     text: 'The fountain dates from 1693. At the time, the city council wanted to ensure that fish sellers at the fish market had sufficient clean water for hygiene reasons. The fountain only operated on market days. In 1996, archaeologists discovered that the water that spouted from the fountain at that time must have originated from the higher-lying castle. In the castle hill, they found not only a water cellar with a sand floor below the surface water level, but also two reservoirs. These could have stored the purified groundwater from the cellar. Furthermore, the archaeologists discovered a connection between these reservoirs and the fish fountain, even passing under the Nieuwe Rijn. The ten-meter height difference ensured that the fountain "spouted".',
-//     image: "static/images/visfontein.jpg",
-//     },
-// ]
-
-// // This adds the markers for all the landmarks
-// const markers = markerData.map((data) => {
-//     const marker = L.marker(data.coords); // start hidden
-//     marker._data = data; // store data for modal use
-//     marker.on('click', () => openModal(data));
-//     return marker;
-// });
-
-
-
 
 // This function declares the necessary variables for the display and functionality of lines and nodes in the map. It is passed  at the start of a round
 function startNewRound() {
     startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
-    // endMarker = L.marker(end, {icon: endIcon, zIndexOffset: -999}).addTo(map).bindPopup("End");
-
-    edgeMarker = L.marker(end, {icon: endIcon, zIndexOffset: -998}).addTo(map).bindPopup("");
 
     // The path represents the list of nodes through which the user has passed
     // The detailed path contains all the subnodes going from node to node in order to create a more detailed path with curves
@@ -240,10 +158,8 @@ function startNewRound() {
     if (playerArrow) { playerArrow.remove(); }
     createPlayerArrow(playerMarker);
     // Default arrow target: point to end marker if available
-
-    // setArrowTarget(end);
-    endLatLng = L.latLng(end)
-    pointArrowToward(endLatLng);
+   
+    pointArrow();
 
 }
 
@@ -289,7 +205,7 @@ function clearMap() {
             
             marker.closePopup();
             neighbourMarkers.forEach(function(marker) {marker.remove()});
-            edgeMarker.setOpacity(0)
+            // edgeMarker.setOpacity(0)
             await moveAlongPositions(playerMarker, subpath);
             currentPosition = playerMarker.getLatLng()
             console.log("Moved to " + currentPosition)
@@ -314,6 +230,7 @@ function clearMap() {
 function checkMarkerDistances() {
     const comparisonPosition =  playerMarker.getLatLng()
     markerData.forEach((markerDatum) => {
+                // console.log(markerDatum.coords)
                 const markerDistance = map.distance(comparisonPosition, markerDatum.coords);
                 if (markerDistance < VISIBILITY_RADIUS & !placedMarkersCoords.has(markerDatum.coords)) {
                     animatePlaceMarker(markerDatum);
@@ -339,13 +256,13 @@ function animatePlaceMarker(markerDatum, finalIconSize = [32, 40], mapInstance =
     el.style.display = "block";
 
     // Initial visual state: large, up above, invisible
-    el.style.transform = "translateY(-40px) scale(4)";
+    el.style.transform = "translateY(-40px) scale(8)";
     el.style.opacity = "0";
 
     // Make sure the browser knows we will animate these properties
     // (also provides a fallback if you didn't include CSS)
     el.style.transition =
-      "transform 450ms cubic-bezier(.25, 1.5, .5, 1), opacity 300ms ease-out";
+      "transform 450ms cubic-bezier(.5, 3.0, 2, 2), opacity 300ms ease-out";
     el.style.willChange = "transform, opacity";
     el.style.transformOrigin = "center bottom";
 
@@ -411,7 +328,7 @@ function animatePlayer(marker, from, to, duration, callback) {
         if (playerArrow) {
             try {
                 playerArrow.setLatLng([lat, lng]);
-                if (endLatLng) pointArrowToward(endLatLng);
+                pointArrow();
             } catch (e) {
                 console.warn('Arrow update failed', e);
             }

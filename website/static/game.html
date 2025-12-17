@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leiden Quest</title>
 
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
     <link rel="stylesheet" href="/static/styles.css">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -22,7 +24,7 @@
                 <p>Welcome to LeidenQuest!</p>
                 <p>In this game you will be able to explore the city of Leiden.</p>
                 <p>Your character will be a green dot. Click on any white circle to move to that position in the map.</p>
-                <p>There are 3 main landmarks to explore currently implemented. The red arrow near your character will act as a guide to take you to each of them.</p>
+                <p>The top-left corner contains the current quest. The red arrow near your character will act as a guide to take you to the quest location.</p>
                 <p>As you move around the city, you will discover points of interest such as restaurants and poems. Click on their markers to view information about them.</p>
                 <p>The progress bar displays the percentage of the total number of points of interests and landmarks you have discovered</p>
             </div>
@@ -32,26 +34,12 @@
 
     <div id="map"></div>
     
-    <!-- Modal overlay -->
-    <!-- <div id="infoModal" class="modal">
-        <div class="modalContent">
-            <div id="modalBasicInfo">
-                <h2 id="modalTitle">Title</h2>
-                <p id="modalText">Text goes here</p>
-                <img id="modalImage" src="" alt="Info image" />
-                <br />
-                <button class="openPanoramaBtn" id="openPanoramaButton">View 360º panorama</button>
-            </div>
-            <div class="panoramaContainer" id="panoramaContainer">Panorama container</div>
-            <br />
-            <button class="closeModalBtn" id="closeModal">&times;</button>
-        </div>
-    </div> -->
+
 
     
 
     <div id="infoOverlay">
-        <p>Quests:</p>
+        <p>Quest:</p>
         <div id="questLog"></div>
     </div>
 

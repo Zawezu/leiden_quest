@@ -128,7 +128,7 @@ async function initializeGame(){
     try{
         // score = 0;
         // scoreText.innerHTML = score;
-        addQuest("Go to the castle");
+        addQuest("Go to the windmill");
         updateQuestLog();
         const data = await initializeFlask();
         console.log(data);
@@ -147,7 +147,8 @@ async function loadData(data){
 
     neighbours = data["neighbours"];
     // end = data["end"]; Normally this.
-    end = [52.15896289011223, 4.492492679291971] // Normally not this. This is the castle coords
+    // end = [52.15896289011223, 4.492492679291971] // Sastle coords
+    end = [52.164610049352, 4.48653665761824] // Windmill coords
     // start = data["start"];
     start = [52.16583, 4.483413] // Leiden Centraal start
     // start = [52.15835, 4.493067] // Castle start
@@ -176,8 +177,12 @@ function addQuest(quest) {
     }
 }
 
-function completeQuest(quest) {
-    quests = quests.filter(e => e !== quest); // Remove the quest from the quests array
+function completeQuest(quest, newQuestLatitude, newQuestLongitude) {
+    if (quests.includes(quest)) {
+        changeEnd([newQuestLatitude, newQuestLongitude]);
+        console.log("New end: " + end);
+        quests = quests.filter(e => e !== quest); // Remove the quest from the quests array
+    }
 }
 
 function updateQuestLog() {

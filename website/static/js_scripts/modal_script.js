@@ -338,7 +338,7 @@ function openModal(data) {
         document.addEventListener('keydown', onKeyDown);
         modalEl.addEventListener('click', onOverlayClick);
 
-        if (data.questEnd) completeQuest(data.questEnd);
+        if (data.questEnd) completeQuest(data.questEnd, data.newQuestLatitude, data.newQuestLongitude);
         if (data.questStart) addQuest(data.questStart);
     } else {
         // BOX (standard) modal behaviour (deterministic side/stacked layout)
