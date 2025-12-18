@@ -174,6 +174,7 @@ function addQuest(quest) {
         quests.push(quest);
         questsSet.add(quest);
         console.log("Added quest " + quest);
+
     }
 }
 
@@ -191,6 +192,11 @@ function updateQuestLog() {
         const line = document.createElement("div");
         line.textContent = `- ${quest}`;
         questLog.appendChild(line);
+
+        if (quests.length == 1 && quests.at(0) == "Tour finished! Roam freely around the city") {
+            console.log("Removing player arrow");
+            map.removeLayer(playerArrow);
+        }
     });
 }
 

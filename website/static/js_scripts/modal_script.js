@@ -351,7 +351,7 @@ function openModal(data) {
         // Header: icon + title (kept outside the scrollable wrapper so it is never overlapped)
         const iconEl = document.createElement('img');
         iconEl.className = 'modalIcon';
-        iconEl.src = 'static/marker_icons/white_marker_icon.webp';
+        iconEl.src = 'static/marker_icons/favicon.webp';
         iconEl.alt = 'icon';
 
         const titleEl = document.createElement('h2');

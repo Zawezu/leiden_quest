@@ -103,7 +103,8 @@ function bearingDegrees(from, to) {
 function pointArrow() {
     // console.log("Arrow marker: ");
     // console.log(playerArrow);
-    console.log("Target: " + end);
+    console.log("End: " + end);
+ 
     arrowTarget = L.latLng(end);
     if (!playerArrow) return;
     const el = playerArrow.getElement();
