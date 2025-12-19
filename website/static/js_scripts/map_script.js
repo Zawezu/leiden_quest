@@ -24,20 +24,28 @@ circleIcon = L.icon({
     popupAnchor: [16, 16]
 });
 
-// Create startIcon
-startIcon = L.icon({
-    iconUrl: 'static/marker_icons/start_marker_icon.webp',
-    iconSize: [32, 48],
-    iconAnchor: [16, 48],
-    popupAnchor:  [16, 48]
-});
+// // Create startIcon
+// startIcon = L.icon({
+//     iconUrl: 'static/marker_icons/start_marker_icon.webp',
+//     iconSize: [32, 48],
+//     iconAnchor: [16, 48],
+//     popupAnchor:  [16, 48]
+// });
+
+// // Create playerIcon
+// playerIcon = L.icon({
+//     iconUrl: 'static/marker_icons/player_icon.webp',
+//     iconSize: [10, 10],
+//     iconAnchor: [5, 5],
+//     popupAnchor: [5, 5]
+// });
 
 // Create playerIcon
 playerIcon = L.icon({
-    iconUrl: 'static/marker_icons/player_icon.webp',
-    iconSize: [10, 10],
-    iconAnchor: [5, 5],
-    popupAnchor: [5, 5]
+    iconUrl: 'static/marker_icons/player_icon_person.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [16, 16]
 });
 
 // Arrow marker (a DivIcon with inline SVG) that will be centered on the player and rotated
@@ -137,7 +145,7 @@ function changeEnd(newEnd) {
 
 // This function declares the necessary variables for the display and functionality of lines and nodes in the map. It is passed  at the start of a round
 function startNewRound() {
-    startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
+    // startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
 
     // The path represents the list of nodes through which the user has passed
     // The detailed path contains all the subnodes going from node to node in order to create a more detailed path with curves

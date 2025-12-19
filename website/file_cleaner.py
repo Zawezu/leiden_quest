@@ -186,7 +186,7 @@ def geojson_converter(in_file_name: str) -> Graph:
     graph = Graph()
 
     try:
-        with open(in_file_name, "r") as infile:
+        with open(in_file_name, "r", encoding="utf-8") as infile:
             # Read the file data and prepare to process it
             gjson: FeatureCollection = load(infile)
             gjson_objs: list[Feature] = gjson["features"]
